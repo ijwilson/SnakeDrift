@@ -27,11 +27,7 @@ shinyUI(
              actionButton("run","Go!")
       )
     ),
-<<<<<<< HEAD
     plotOutput("showSnakes")
-=======
-    plotOutput("showWorms")
->>>>>>> e031fa0381c7dac0dc8165948069c75802f5683d
   )
 )
 
