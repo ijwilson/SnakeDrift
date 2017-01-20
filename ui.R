@@ -12,22 +12,24 @@ shinyUI(
       sliderInput("n",
                     "Population Size:",
                     min = 5,
-                    max = 20,
+                    max = 40,
                     value = 10) 
       ),
       column(4,
         sliderInput("gens",
                     "Generations:",
                     min = 5,
-                    max = 20,
+                    max = 40,
                     value = 10) 
       ),
       column(3,
-             checkboxInput("two_colours", "Two Colours", value = FALSE),
+             checkboxInput("two_colours", "Two Colours", value = FALSE)
+      ),
+      column(3,
              actionButton("run","Go!")
       )
     ),
-    plotOutput("showSnakes")
+    plotOutput("showSnakes", height="500px")
   )
 )
 
