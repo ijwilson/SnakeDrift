@@ -10,10 +10,8 @@ library(rje)    ## for colours
 ### or b) We have added another set of data
 
 plotFreqs <- function(flist) {
-  print(flist)
   gens <- length(flist[[1]]$freq)
-  print(paste("gens = ", gens))
-  
+
   plotpoints <- function(col_freq_pair) {
     colours <- rep(1, gens)
     colours[col_freq_pair[[2]]==0] <- 2
@@ -67,8 +65,14 @@ shinyServer(function(input, output) {
     n <- as.integer(isolate(input$n))                 
     gens <- as.integer(isolate(input$gens))
     linecolour <- as.integer(isolate(input$line_colour))
+    
     input$run
-    print(paste("current_generation = ", current_generations))
+    input$clear
+    
+ #   clearPlot <- eventReactive(input$clear, {
+#      v$frequency_list <- list()    ## empty the list
+ ##     v$current_generations <- gens
+   # })
     
     if (isolate(input$two_colours)) {
       cols <- sort(rep(cubeHelix(10)[c(3,9)], length.out=n))
@@ -80,15 +84,15 @@ shinyServer(function(input, output) {
     
     par(mar=c(0,2,0,0), mgp=c(0,0,0))      ## fix margins
     
-    if (gens != current_generations) {
-      isolate(v$frequency_list) <- list()    ## empty the list
-      isolate(v$current_generations) <- gens
+    if (gens != isolate(v$current_generations) ) {
+      v$frequency_list <- list()    ## empty the list
+      v$current_generations <- gens
     }
     
     f <- plotSnakes(n, gens, cols)
-    print(f)
-    v$frequency_list <- [[length(frequency_list)+1]] <- list(col=linecolour, freq=f)
-    print(length(frequency_list))
-    plotFreqs(frequency_list)
+
+    isolate(v$frequency_list[[length(isolate(v$frequency_list))+1]] <- list(col=linecolour, freq=f))
+    
+    plotFreqs(isolate(v$frequency_list))
   })
 })

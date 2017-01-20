@@ -28,7 +28,8 @@ shinyUI(
       ),
       column(2,
              checkboxInput("two_colours", "Two Colours", value = FALSE),
-             actionButton("run","Go!")
+             actionButton("run", "Go!")#,
+          #   actionButton("clear","Clear")
       )
     ),
     plotOutput("showSnakes", height="500px")
