@@ -22,11 +22,6 @@ shinyUI(
                     value = 10) 
       ),
       column(2,
-             selectInput("line_colour", "Line Colour", 
-                         choices=list("Black"=1,  "Red"=2, "Blue"=4, "Green"=3, "Cyan"=5, "Magenta"=6)
-                         , selected="Black")
-      ),
-      column(2,
              checkboxInput("two_colours", "Two Colours", value = FALSE),
              actionButton("run","Go!")
       )

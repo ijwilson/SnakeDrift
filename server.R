@@ -1,43 +1,30 @@
+library(shiny)
+library(rje)    ## for colours
 
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
+plotFreqs <- function(freq) {
+  gens <- length(freq)
 
-frequency_list <- list()
-current_generations <- 1
-
-### Plotfreqs should beony be called when we have
-### either a) A new set of parameters and only one set of frequencies
-### or b) We have added another set of data
-
-plotFreqs <- function(flist) {
-  print(flist)
-  gens <- length(flist[[1]]$freq)
-  print(paste("gens = ", gens))
-  
-  plotpoints <- function(col_freq_pair) {
+  plotpoints <- function(f) {
     colours <- rep(1, gens)
-    colours[col_freq_pair[[2]]==0] <- 2
-    colours[col_freq_pair[[2]]==1] <- 3
-    points((1:gens)-0.5, col_freq_pair[[2]], col=colours, cex=2, pch=18)
-    points((1:gens)-0.5, col_freq_pair[[2]], type="c",col=col_freq_pair[[1]])
+    colours[f==0] <- 2
+    colours[f==1] <- 3
+    points((1:gens)-0.5, f, col=colours, cex=2, pch=18)
+    points((1:gens)-0.5, f, type="c")
   }
   
   par(mar=c(2, 2, 0, 0), mgp=c(1, 0.5, 0))      ## fix margins
   plot(NULL, xlim=c(0.2, gens), ylim=c(0,1), axes=FALSE,xlab="",ylab="")
-  segments(0,0,gens,0, col="lightgrey")
-  segments(0,0.5,gens,0.5, col="lightgrey")
-  segments(0, 1,gens, 1, col="lightgrey")
   
-  lapply(flist, plotpoints)
+  lapply(c(0,0.5,1), function(y) segments(0, y,gens, y, col="lightgrey"))
+  
+  plotpoints(freq)
 
   axis(1, at=1:gens - 0.5, labels=1:gens, tick=FALSE, cex=1.2)
   axis(2, at=c(0,0.5,1))
 }
 
 plotSnakes <- function(n, gens, colours) {
+  par(mar=c(0,2,0,0), mgp=c(0,0,0))      ## fix margins
   freq <- numeric(gens)
   plot(1, type="n", ylim=c(1-0.5, n+0.5), xlim=c(0.2, gens), axes=FALSE, ylab="", xlab="")
   ybottom <- seq((1:n))-0.3
@@ -60,41 +47,28 @@ plotSnakes <- function(n, gens, colours) {
 
 
 
-
-library(shiny)
-library(rje)    ## for colours
-
 shinyServer(function(input, output) {
+  a <- reactiveValues()
+  a$time=Sys.time()
   
-  v <- reactiveValues(doPlot=FALSE)
-
   output$showSnakes <- renderPlot({
-    ## get parameters
+    ## isolated input
     n <- as.integer(isolate(input$n))                 
     gens <- as.integer(isolate(input$gens))
-    linecolour <- as.integer(isolate(input$line_colour))
-    input$run
-    print(paste("current_generation = ", current_generations))
-    
     if (isolate(input$two_colours)) {
       cols <- sort(rep(cubeHelix(10)[c(3,9)], length.out=n))
     } else {
       cols <- cubeHelix(n)
     }
-    ## blank plots 
+    ## reactive input
+    input$run
+
+    ## set up the plot layout
     layout(matrix(c(1,2), ncol=1), heights=c(3,1))
     
-    par(mar=c(0,2,0,0), mgp=c(0,0,0))      ## fix margins
-    print(gens)
-    print(linecolour)
-    if (gens != current_generations) {
-      frequency_list <- list()    ## empty the list
-      current_generations <- gens
-    }
     f <- plotSnakes(n, gens, cols)
-    print(f)
-    frequency_list[[length(frequency_list)+1]] <- list(col=linecolour, freq=f)
-    print(length(frequency_list))
-    plotFreqs(frequency_list)
+    plotFreqs(f)
+    a$time <- c(isolate(a$time), Sys.time())
+    print( a$time)
   })
 })
