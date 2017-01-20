@@ -22,10 +22,8 @@ plotFreqs <- function(flist) {
   
   par(mar=c(2, 2, 0, 0), mgp=c(1, 0.5, 0))      ## fix margins
   plot(NULL, xlim=c(0.2, gens), ylim=c(0,1), axes=FALSE,xlab="",ylab="")
-  segments(0,0,gens,0, col="lightgrey")
-  segments(0,0.5,gens,0.5, col="lightgrey")
-  segments(0, 1,gens, 1, col="lightgrey")
-  
+  lapply(c(0,0.5,1), function(y) segments(0, y, gens, y, col="lightgrey"))
+
   lapply(flist, plotpoints)
 
   axis(1, at=1:gens - 0.5, labels=1:gens, tick=FALSE, cex=1.2)
@@ -67,13 +65,7 @@ shinyServer(function(input, output) {
     linecolour <- as.integer(isolate(input$line_colour))
     
     input$run
-    input$clear
-    
- #   clearPlot <- eventReactive(input$clear, {
-#      v$frequency_list <- list()    ## empty the list
- ##     v$current_generations <- gens
-   # })
-    
+
     if (isolate(input$two_colours)) {
       cols <- sort(rep(cubeHelix(10)[c(3,9)], length.out=n))
     } else {
@@ -81,7 +73,6 @@ shinyServer(function(input, output) {
     }
     ## blank plots 
     layout(matrix(c(1,2), ncol=1), heights=c(3,1))
-    
     par(mar=c(0,2,0,0), mgp=c(0,0,0))      ## fix margins
     
     if (gens != isolate(v$current_generations) ) {
@@ -90,9 +81,7 @@ shinyServer(function(input, output) {
     }
     
     f <- plotSnakes(n, gens, cols)
-
     isolate(v$frequency_list[[length(isolate(v$frequency_list))+1]] <- list(col=linecolour, freq=f))
-    
     plotFreqs(isolate(v$frequency_list))
   })
 })
