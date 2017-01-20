@@ -1,12 +1,9 @@
 
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
 
-frequency_list <- list()
-current_generations <- 1
+
+library(shiny)
+library(rje)    ## for colours
+
 
 ### Plotfreqs should beony be called when we have
 ### either a) A new set of parameters and only one set of frequencies
@@ -59,14 +56,11 @@ plotSnakes <- function(n, gens, colours) {
 }
 
 
-
-
-library(shiny)
-library(rje)    ## for colours
-
 shinyServer(function(input, output) {
   
-  v <- reactiveValues(doPlot=FALSE)
+  v <- reactiveValues()
+  v$frequency_list <- NULL
+  v$current_generations <- 1
 
   output$showSnakes <- renderPlot({
     ## get parameters
@@ -85,15 +79,15 @@ shinyServer(function(input, output) {
     layout(matrix(c(1,2), ncol=1), heights=c(3,1))
     
     par(mar=c(0,2,0,0), mgp=c(0,0,0))      ## fix margins
-    print(gens)
-    print(linecolour)
+    
     if (gens != current_generations) {
-      frequency_list <- list()    ## empty the list
-      current_generations <- gens
+      isolate(v$frequency_list) <- list()    ## empty the list
+      isolate(v$current_generations) <- gens
     }
+    
     f <- plotSnakes(n, gens, cols)
     print(f)
-    frequency_list[[length(frequency_list)+1]] <- list(col=linecolour, freq=f)
+    v$frequency_list <- [[length(frequency_list)+1]] <- list(col=linecolour, freq=f)
     print(length(frequency_list))
     plotFreqs(frequency_list)
   })
